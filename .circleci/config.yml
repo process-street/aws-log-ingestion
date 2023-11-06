@@ -2,25 +2,62 @@
 # See: https://circleci.com/docs/configuration-reference
 version: 2.1
 
-# Define a job to be invoked later in a workflow.
-# See: https://circleci.com/docs/configuration-reference/#jobs
-jobs:
-  say-hello:
-    # Specify the execution environment. You can specify an image from Docker Hub or use one of our convenience images from CircleCI's Developer Hub.
-    # See: https://circleci.com/docs/configuration-reference/#executor-job
+references:
+  docker_image: &docker_image
     docker:
-      - image: cimg/base:stable
-    # Add steps to the job
-    # See: https://circleci.com/docs/configuration-reference/#steps
+      - image: cimg/node:21.1.0
+        environment:
+          NODE_OPTIONS: --max_old_space_size=4096
+
+  container_config: &container_config
+    <<: *docker_image
+    working_directory: ~/repo
+
+
+  system_dependencies: &system_dependencies
+    run:
+      name: Install system requirements
+      command: |
+#        sudo apt-get update
+#        sudo apt-get install python-pip python-dev ruby-full
+        npm install -g serverless
+        sls plugin install -n serverless-python-requirements
+
+
+jobs:
+  checkout_code:
+    <<: *container_config
     steps:
       - checkout
       - run:
-          name: "Say hello"
-          command: "echo Hello, World!"
+          name: Show current branch
+          command: echo ${CIRCLE_BRANCH}
 
-# Orchestrate jobs using workflows
-# See: https://circleci.com/docs/configuration-reference/#workflows
+  deploy_test:
+    <<: *container_config
+    steps:
+      - *system_dependencies
+      - run:
+          name: Bind Environment Variables
+          command: |
+            echo 'export LICENSE_KEY=$STAGING_LICENSE_KEY' >> $BASH_ENV
+            echo 'export AWS_ACCESS_KEY_ID=$STAGING_AWS_ACCESS_KEY_ID' >> $BASH_ENV
+            echo 'export AWS_SECRET_ACCESS_KEY=$STAGING_AWS_SECRET_ACCESS_KEY' >> $BASH_ENV
+      - run: sls deploy --verbose
+
+
 workflows:
-  say-hello-workflow:
+  version: 2
+
+  build-log-ingestion:
     jobs:
-      - say-hello
+      - checkout_code
+      - deploy_test:
+          requires:
+            - checkout_code
+          filters:
+            branches:
+              only: circleci-project-setup #master
+
+
+
