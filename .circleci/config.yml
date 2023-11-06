@@ -18,8 +18,6 @@ references:
     run:
       name: Install system requirements
       command: |
-#        sudo apt-get update
-#        sudo apt-get install python-pip python-dev ruby-full
         npm install -g serverless
         sls plugin install -n serverless-python-requirements
 
