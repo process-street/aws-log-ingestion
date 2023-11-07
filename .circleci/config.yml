@@ -49,8 +49,6 @@ workflows:
   build-log-ingestion:
     jobs:
       - deploy_test:
-          requires:
-            - checkout_code
           filters:
             branches:
               only: circleci-project-setup #master
