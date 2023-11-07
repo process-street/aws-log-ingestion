@@ -2,42 +2,38 @@
 # See: https://circleci.com/docs/configuration-reference
 version: 2.1
 
-references:
-  docker_image: &docker_image
+executors:
+  docker_image:
     docker:
       - image: cimg/node:21.1.0
         environment:
           NODE_OPTIONS: --max_old_space_size=4096
 
-  container_config: &container_config
-    <<: *docker_image
-    working_directory: ~/repo
-
-
-  system_dependencies: &system_dependencies
-    working_directory: ~/repo
-    run:
-      name: Install system requirements
-      command: |
-        sudo npm install -g serverless
-        sls plugin install -n serverless-python-requirements
-
+commands:
+  install_serverless:
+    description: Install system requirements
+    steps:
+      - setup_remote_docker:
+          docker_layer_caching: false
+      - run: |
+          sudo npm install -g serverless
+          sls plugin install -n serverless-python-requirements
 
 jobs:
   checkout_code:
-    <<: *container_config
+    executor: docker_image
+    
     working_directory: ~/repo
     steps:
       - checkout
       - run:
           name: Show current branch
           command: echo ${CIRCLE_BRANCH}
+      - install_serverless
 
   deploy_test:
-    <<: *container_config
-    working_directory: ~/repo
+    executor: docker_image
     steps:
-      - *system_dependencies
       - run:
           name: Bind Environment Variables
           command: |
