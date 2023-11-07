@@ -4,6 +4,7 @@ version: 2.1
 
 executors:
   docker_image:
+    working_directory: ~/repo
     docker:
       - image: cimg/node:21.1.0
         environment:
@@ -19,11 +20,8 @@ commands:
           sudo npm install -g serverless
           sls plugin install -n serverless-python-requirements
 
-jobs:
   checkout_code:
-    executor: docker_image
-    
-    working_directory: ~/repo
+    description: Checkout code
     steps:
       - checkout
       - run:
@@ -31,9 +29,11 @@ jobs:
           command: echo ${CIRCLE_BRANCH}
       - install_serverless
 
+jobs:
   deploy_test:
     executor: docker_image
     steps:
+      - checkout_code
       - run:
           name: Bind Environment Variables
           command: |
