@@ -25,6 +25,7 @@ references:
 jobs:
   checkout_code:
     <<: *container_config
+    working_directory: ~/repo
     steps:
       - checkout
       - run:
@@ -33,6 +34,7 @@ jobs:
 
   deploy_test:
     <<: *container_config
+    working_directory: ~/repo
     steps:
       - *system_dependencies
       - run:
