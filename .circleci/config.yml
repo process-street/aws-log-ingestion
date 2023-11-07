@@ -15,6 +15,7 @@ references:
 
 
   system_dependencies: &system_dependencies
+    working_directory: ~/repo
     run:
       name: Install system requirements
       command: |
