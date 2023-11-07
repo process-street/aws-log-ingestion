@@ -48,7 +48,6 @@ workflows:
 
   build-log-ingestion:
     jobs:
-      - checkout_code
       - deploy_test:
           requires:
             - checkout_code
