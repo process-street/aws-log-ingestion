@@ -14,7 +14,7 @@ provider:
 
   environment:
     # Determines if logs are forwarded to New Relic Infrastructure
-    INFRA_ENABLED: ${env:INFRA_ENABLED, "True"}
+    INFRA_ENABLED: ${env:INFRA_ENABLED, "False"}
     # Your NewRelic license key
     LICENSE_KEY: ${env:LICENSE_KEY}
     # Determines if logs are forwarded to New Relic Logging
@@ -28,10 +28,8 @@ custom:
     fileName: ./src/requirements.txt
 
 package:
-  exclude:
-    - ./**
-  include:
-
+  patterns:
+    - '!./**'
     - ./LICENSE
     - ./src/function.py
 
