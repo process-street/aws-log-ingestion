@@ -6,7 +6,7 @@ executors:
   docker_image:
     working_directory: ~/repo
     docker:
-      - image: cimg/node:21.1.0
+      - image: cimg/node:20.9
         environment:
           NODE_OPTIONS: --max_old_space_size=4096
 
