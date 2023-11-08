@@ -3,7 +3,7 @@ service: newrelic-log-ingestion
 provider:
   name: aws
   runtime: python3.9
-  stage: production
+  stage: ${opt:stage, 'dev'} # Set the default stage used. Default is dev
   timeout: 30
 
   # Uncomment this line to use your own IAM role
@@ -36,7 +36,7 @@ functions:
   newrelic-log-ingestion:
     description: Send log data from CloudWatch Logs to New Relic Infrastructure (Cloud Integrations) and New Relic Logging.
     handler: src/function.lambda_handler
-    name: newrelic-log-ingestion
+    name: newrelic-log-ingestion-${opt:stage}
 
 plugins:
   - serverless-python-requirements
