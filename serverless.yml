@@ -2,9 +2,12 @@ service: newrelic-log-ingestion
 
 provider:
   name: aws
+  region: us-west-2
   runtime: python3.9
   stage: ${opt:stage, 'dev'} # Set the default stage used. Default is dev
   timeout: 30
+  deploymentBucket:
+    blockPublicAccess: true # Prevents public access via ACLs or bucket policies. Default is false
 
   # Uncomment this line to use your own IAM role
   #role: arn:aws:iam::YourAccountNumber:role/YourIamRole
