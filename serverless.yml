@@ -7,6 +7,7 @@ provider:
   stackName: newrelic-log-ingestion-${opt:stage}
   stage: ${opt:stage, 'dev'} # Set the default stage used. Default is dev
   deploymentBucket:
+    name: newrelic-log-ingestion-${opt:stage}-deployment-bucket
     blockPublicAccess: true # Prevents public access via ACLs or bucket policies. Default is false
 
   # Uncomment this line to use your own IAM role
