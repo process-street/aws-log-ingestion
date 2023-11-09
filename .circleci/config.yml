@@ -18,7 +18,7 @@ commands:
           docker_layer_caching: false
       - run: |
           sudo npm install -g serverless
-          sudo apt-get upgrade
+          sudo apt-get update
           sudo apt-get install pip
           curl -sSL https://install.python-poetry.org | python3 -
           sls plugin install -n serverless-python-requirements
