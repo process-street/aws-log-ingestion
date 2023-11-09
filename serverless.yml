@@ -43,3 +43,5 @@ functions:
 
 plugins:
   - serverless-python-requirements
+  - serverless-deployment-bucket
+
