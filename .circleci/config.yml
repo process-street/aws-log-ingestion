@@ -29,19 +29,31 @@ commands:
           command: echo ${CIRCLE_BRANCH}
       - install_serverless
 
-jobs:
-  deploy_test:
-    executor: docker_image
+  bind_env_vars:
+    description: Bind Environment Variables
     steps:
-      - checkout_code
       - run:
           name: Bind Environment Variables
           command: |
             echo 'export LICENSE_KEY=$STAGING_LICENSE_KEY' >> "$BASH_ENV"
             echo 'export AWS_ACCESS_KEY_ID=$STAGING_AWS_ACCESS_KEY_ID' >> "$BASH_ENV"
             echo 'export AWS_SECRET_ACCESS_KEY=$STAGING_AWS_SECRET_ACCESS_KEY' >> "$BASH_ENV"
+            echo 'export DUMMY=deploy1' >> "$BASH_ENV"
             source "$BASH_ENV"
-      - run: sls deploy --verbose -s test
+
+
+jobs:
+  deploy_test:
+    executor: docker_image
+    steps:
+      - checkout_code
+      - bind_env_vars
+      - run:
+          name: Sls deploy
+          command: |
+            echo $DUMMY
+            python –version
+            sls deploy --verbose -s test
 
 
 workflows:
