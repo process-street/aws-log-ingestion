@@ -52,7 +52,7 @@ jobs:
           name: Sls deploy
           command: |
             echo $DUMMY
-            python –version
+            python –-version
             sls deploy --verbose -s test
 
 
