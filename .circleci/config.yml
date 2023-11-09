@@ -81,20 +81,20 @@ workflows:
       - deploy_test:
           filters:
             branches:
-              only: circleci-project-setup #master
+              only: master
       - deploy_prod_approval:
           type: approval
           requires:
             - deploy_test
           filters:
             branches:
-              only: circleci-project-setup #master
+              only: master
       - deploy_prod:
           requires:
             - deploy_prod_approval
           filters:
             branches:
-              only: circleci-project-setup #master
+              only: master
 
 
 
