@@ -16,12 +16,14 @@ commands:
     steps:
       - setup_remote_docker:
           docker_layer_caching: false
-      - run: |
-          sudo npm install -g serverless
-          sudo apt-get update
-          sudo apt-get install pip
-          curl -sSL https://install.python-poetry.org | python3 -
-          sls plugin install -n serverless-python-requirements
+      - run:
+          name: Install system requirements
+          command: |
+            sudo npm install -g serverless
+            sudo apt-get update
+            sudo apt-get install pip
+            curl -sSL https://install.python-poetry.org | python3 -
+            sls plugin install -n serverless-python-requirements
           
 
   checkout_code:
@@ -42,7 +44,6 @@ commands:
             echo 'export LICENSE_KEY=$STAGING_LICENSE_KEY' >> "$BASH_ENV"
             echo 'export AWS_ACCESS_KEY_ID=$STAGING_AWS_ACCESS_KEY_ID' >> "$BASH_ENV"
             echo 'export AWS_SECRET_ACCESS_KEY=$STAGING_AWS_SECRET_ACCESS_KEY' >> "$BASH_ENV"
-            echo 'export DUMMY=deploy1' >> "$BASH_ENV"
             source "$BASH_ENV"
 
 
@@ -55,7 +56,6 @@ jobs:
       - run:
           name: Sls deploy
           command: |
-            echo $DUMMY
             python --version
             poetry --version
             sls deploy --verbose -s test
