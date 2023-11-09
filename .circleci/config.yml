@@ -1,0 +1,100 @@
+# Use the latest 2.1 version of CircleCI pipeline process engine.
+# See: https://circleci.com/docs/configuration-reference
+version: 2.1
+
+executors:
+  docker_image:
+    working_directory: ~/repo
+    docker:
+      - image: cimg/node:18.18
+        environment:
+          NODE_OPTIONS: --max_old_space_size=4096
+
+commands:
+  install_serverless:
+    description: Install system requirements
+    steps:
+      - setup_remote_docker:
+          docker_layer_caching: false
+      - run:
+          name: Install system requirements
+          command: |
+            sudo npm install -g serverless
+            sudo apt-get update
+            sudo apt-get install pip
+            curl -sSL https://install.python-poetry.org | python3 -
+            sls plugin install -n serverless-python-requirements
+            sls plugin install -n serverless-deployment-bucket
+
+  checkout_code:
+    description: Checkout code
+    steps:
+      - checkout
+      - run:
+          name: Show current branch
+          command: echo ${CIRCLE_BRANCH}
+      - install_serverless
+
+  bind_env_vars:
+    description: Bind Environment Variables
+    steps:
+      - run:
+          name: Bind Environment Variables
+          command: |
+            echo 'export LICENSE_KEY=$STAGING_LICENSE_KEY' >> "$BASH_ENV"
+            echo 'export AWS_ACCESS_KEY_ID=$STAGING_AWS_ACCESS_KEY_ID' >> "$BASH_ENV"
+            echo 'export AWS_SECRET_ACCESS_KEY=$STAGING_AWS_SECRET_ACCESS_KEY' >> "$BASH_ENV"
+            source "$BASH_ENV"
+
+
+jobs:
+  deploy_test:
+    executor: docker_image
+    steps:
+      - checkout_code
+      - bind_env_vars
+      - run:
+          name: Serverless deploy test
+          command: |
+            python --version
+            poetry --version
+            sls deploy --verbose -s test
+
+  deploy_prod:
+    executor: docker_image
+    steps:
+      - checkout_code
+      - bind_env_vars
+      - run:
+          name: Serverless deploy prod
+          command: |
+            python --version
+            poetry --version
+            sls deploy --verbose -s prod
+
+
+workflows:
+  version: 2
+
+  build-log-ingestion:
+    jobs:
+      - deploy_test:
+          filters:
+            branches:
+              only: master
+      - deploy_prod_approval:
+          type: approval
+          requires:
+            - deploy_test
+          filters:
+            branches:
+              only: master
+      - deploy_prod:
+          requires:
+            - deploy_prod_approval
+          filters:
+            branches:
+              only: master
+
+
+
