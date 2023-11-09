@@ -54,11 +54,23 @@ jobs:
       - checkout_code
       - bind_env_vars
       - run:
-          name: Sls deploy
+          name: Serverless deploy test
           command: |
             python --version
             poetry --version
             sls deploy --verbose -s test
+
+  deploy_prod:
+    executor: docker_image
+    steps:
+      - checkout_code
+      - bind_env_vars
+      - run:
+          name: Serverless deploy prod
+          command: |
+            python --version
+            poetry --version
+            sls deploy --verbose -s prod
 
 
 workflows:
@@ -67,6 +79,19 @@ workflows:
   build-log-ingestion:
     jobs:
       - deploy_test:
+          filters:
+            branches:
+              only: circleci-project-setup #master
+      - deploy_prod_approval:
+          type: approval
+          requires:
+            - deploy_test
+          filters:
+            branches:
+              only: circleci-project-setup #master
+      - deploy_prod:
+          requires:
+            - deploy_prod_approval
           filters:
             branches:
               only: circleci-project-setup #master
