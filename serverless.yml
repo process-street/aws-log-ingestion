@@ -4,8 +4,8 @@ provider:
   name: aws
   region: us-west-2
   runtime: python3.9
+  stackName: newrelic-log-ingestion-${opt:stage}
   stage: ${opt:stage, 'dev'} # Set the default stage used. Default is dev
-  timeout: 30
   deploymentBucket:
     blockPublicAccess: true # Prevents public access via ACLs or bucket policies. Default is false
 
