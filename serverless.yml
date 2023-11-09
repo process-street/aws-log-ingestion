@@ -3,7 +3,7 @@ service: newrelic-log-ingestion
 provider:
   name: aws
   region: us-west-2
-  runtime: python3.10
+  runtime: python3.9
   stage: ${opt:stage, 'dev'} # Set the default stage used. Default is dev
   timeout: 30
   deploymentBucket:
@@ -25,8 +25,8 @@ provider:
 custom:
   pythonRequirements:
     pythonBin: python3
-    dockerizePip: false
-    #dockerizePip: true
+    #dockerizePip: false
+    dockerizePip: true
     fileName: ./src/requirements.txt
 
 package:
