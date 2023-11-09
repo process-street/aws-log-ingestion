@@ -55,6 +55,7 @@ jobs:
           command: |
             echo $DUMMY
             python --version
+            poetry --version
             sls deploy --verbose -s test
 
 
