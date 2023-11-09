@@ -24,7 +24,9 @@ provider:
 
 custom:
   pythonRequirements:
-    dockerizePip: true
+    pythonBin: python3
+    dockerizePip: false
+    #dockerizePip: true
     fileName: ./src/requirements.txt
 
 package:
